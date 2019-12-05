@@ -15,6 +15,8 @@ namespace Persistence
         // Values is the name for the table in sqlite | entities
         public DbSet<Value> Values { get; set; }
 
+        public DbSet<Activity> Activities { get; set; }
+
         // protected = only accessed in this class or derived class
         // overriding a method inside the DbContext class
         // when we create another migration, this will insert the values into our values table
