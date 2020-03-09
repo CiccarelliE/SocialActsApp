@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Activities;
@@ -29,12 +30,24 @@ namespace API.Controllers
 
         }
 
-        // Endpoints
+        // ENDPOINTS \\
+
         // API method for getting a list of activities/events
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> List()
         {
             return await _mediator.Send(new List.Query());
         }
+
+        // getting specific event based on id
+        // params pass through httpget
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Activity>> Details(Guid id)
+        {
+            // initialize query class with id by using {} to have access to route param
+            return await _mediator.Send(new Details.Query { Id = id });
+        }
+
+
     }
 }

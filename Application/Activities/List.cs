@@ -30,6 +30,7 @@ namespace Application.Activities
             // required above
 
             // Handle method | Async
+            // cancellation tokens are a way to stop the entire http process from continuing to help the server
             public async Task<List<Activity>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var activitiesList = await _context.Activities.ToListAsync();
