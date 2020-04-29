@@ -14,6 +14,7 @@ interface IProps {
   setSelectedEvent: (event: IEvent | null) => void;
   createEvent: (event: IEvent) => void;
   editEvent: (event: IEvent) => void;
+  deleteEvent: (id: string) => void;
 }
 
 const EventDashboard: React.FC<IProps> = ({
@@ -24,12 +25,17 @@ const EventDashboard: React.FC<IProps> = ({
   setEditMode,
   setSelectedEvent,
   createEvent,
-  editEvent
+  editEvent,
+  deleteEvent,
 }) => {
   return (
     <Grid>
       <Grid.Column width={10}>
-        <EventList events={events} selectEvent={selectEvent} />
+        <EventList
+          events={events}
+          selectEvent={selectEvent}
+          deleteEvent={deleteEvent}
+        />
       </Grid.Column>
       <Grid.Column width={6}>
         {selectedEvent && !editMode && (
@@ -41,6 +47,7 @@ const EventDashboard: React.FC<IProps> = ({
         )}
         {editMode && (
           <EventForm
+            key={(selectedEvent && selectedEvent.id) || 0}
             setEditMode={setEditMode}
             currentEvent={selectedEvent!}
             createEvent={createEvent}

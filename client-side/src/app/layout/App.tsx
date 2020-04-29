@@ -12,7 +12,8 @@ const App = () => {
   const [editMode, setEditMode] = useState(false);
 
   const handleSelectEvent = (id: string) => {
-    setSelectedEvent(events.filter(a => a.id === id)[0]);
+    setSelectedEvent(events.filter((a) => a.id === id)[0]);
+    setEditMode(false);
   };
 
   const handleOpenCreateForm = () => {
@@ -29,16 +30,27 @@ const App = () => {
 
   const handleEditEvent = (event: IEvent) => {
     setEvents([
-      ...events.filter(eventItem => eventItem.id !== event.id),
-      event
+      ...events.filter((eventItem) => eventItem.id !== event.id),
+      event,
     ]);
     setSelectedEvent(event);
     setEditMode(false);
   };
 
+  const handleDeleteEvent = (id: string) => {
+    // this spreads the current events and then filters through to return all of the events with ids that do not match the one that is going to be deleted
+    setEvents([...events.filter((e) => e.id !== id)]);
+  };
+
   useEffect(() => {
-    axios.get<IEvent[]>("http://localhost:5000/api/events").then(response => {
-      setEvents(response.data);
+    axios.get<IEvent[]>("http://localhost:5000/api/events").then((response) => {
+      let events: IEvent[] = [];
+      response.data.forEach((event) => {
+        // looping through response data and spliting the datetime at the period, we only want the first part so you add [0] at the end
+        event.date = event.date.split(".")[0];
+        events.push(event);
+      });
+      setEvents(events);
     });
   }, []);
 
@@ -55,6 +67,7 @@ const App = () => {
           setSelectedEvent={setSelectedEvent}
           createEvent={handleCreateActivity}
           editEvent={handleEditEvent}
+          deleteEvent={handleDeleteEvent}
         />
       </Container>
     </Fragment>

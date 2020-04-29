@@ -16,7 +16,7 @@ const EventForm: React.FC<IProps> = ({
   setEditMode,
   currentEvent,
   createEvent,
-  editEvent
+  editEvent,
 }) => {
   // if there is an exisiting currentEvent value, return it
   const initializeForm = () => {
@@ -33,7 +33,7 @@ const EventForm: React.FC<IProps> = ({
         description: "",
         date: "",
         city: "",
-        venue: ""
+        venue: "",
       };
     }
   };
@@ -47,7 +47,7 @@ const EventForm: React.FC<IProps> = ({
     if (modifyEvent.id.length === 0) {
       let newEvent = {
         ...modifyEvent,
-        id: uuid()
+        id: uuid(),
       };
       createEvent(newEvent);
     } else {
@@ -89,7 +89,7 @@ const EventForm: React.FC<IProps> = ({
         <Form.Input
           onChange={handleInputChange}
           name="date"
-          type="date"
+          type="datetime-local"
           placeholder="Date"
           value={modifyEvent.date}
         />

@@ -5,13 +5,14 @@ import { IEvent } from "../../../app/models/event";
 interface IProps {
   events: IEvent[];
   selectEvent: (id: string) => void;
+  deleteEvent: (id: string) => void;
 }
 
-const EventList: React.FC<IProps> = ({ events, selectEvent }) => {
+const EventList: React.FC<IProps> = ({ events, selectEvent, deleteEvent }) => {
   return (
     <Segment clearing>
       <Item.Group divided>
-        {events.map(event => (
+        {events.map((event) => (
           <Item key={event.id}>
             <Item.Content>
               <Item.Header as="a">{event.title}</Item.Header>
@@ -28,6 +29,12 @@ const EventList: React.FC<IProps> = ({ events, selectEvent }) => {
                   floated="right"
                   content="View"
                   color="blue"
+                />
+                <Button
+                  onClick={() => deleteEvent(event.id)}
+                  floated="right"
+                  content="Delete"
+                  color="red"
                 />
                 <Label basic content={event.category} />
               </Item.Extra>
