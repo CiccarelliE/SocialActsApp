@@ -1,4 +1,4 @@
-import React from "react";
+import React, { SyntheticEvent } from "react";
 import { Grid } from "semantic-ui-react";
 import { IEvent } from "../../../app/models/event";
 import EventList from "./EventList";
@@ -14,7 +14,9 @@ interface IProps {
   setSelectedEvent: (event: IEvent | null) => void;
   createEvent: (event: IEvent) => void;
   editEvent: (event: IEvent) => void;
-  deleteEvent: (id: string) => void;
+  deleteEvent: (e: SyntheticEvent<HTMLButtonElement>, id: string) => void;
+  submiting: boolean;
+  target: string;
 }
 
 const EventDashboard: React.FC<IProps> = ({
@@ -27,6 +29,8 @@ const EventDashboard: React.FC<IProps> = ({
   createEvent,
   editEvent,
   deleteEvent,
+  submiting,
+  target,
 }) => {
   return (
     <Grid>
@@ -35,6 +39,8 @@ const EventDashboard: React.FC<IProps> = ({
           events={events}
           selectEvent={selectEvent}
           deleteEvent={deleteEvent}
+          submiting={submiting}
+          target={target}
         />
       </Grid.Column>
       <Grid.Column width={6}>
@@ -52,6 +58,7 @@ const EventDashboard: React.FC<IProps> = ({
             currentEvent={selectedEvent!}
             createEvent={createEvent}
             editEvent={editEvent}
+            submiting={submiting}
           />
         )}
       </Grid.Column>

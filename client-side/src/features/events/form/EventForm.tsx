@@ -8,6 +8,7 @@ interface IProps {
   currentEvent: IEvent;
   createEvent: (event: IEvent) => void;
   editEvent: (event: IEvent) => void;
+  submiting: boolean;
 }
 
 // currentEvent is going to be the var for if there is an exisiting event
@@ -17,6 +18,7 @@ const EventForm: React.FC<IProps> = ({
   currentEvent,
   createEvent,
   editEvent,
+  submiting,
 }) => {
   // if there is an exisiting currentEvent value, return it
   const initializeForm = () => {
@@ -105,7 +107,13 @@ const EventForm: React.FC<IProps> = ({
           placeholder="Venue"
           value={modifyEvent.venue}
         />
-        <Button floated="right" positive type="submit" content="Submit" />
+        <Button
+          loading={submiting}
+          floated="right"
+          positive
+          type="submit"
+          content="Submit"
+        />
         <Button
           onClick={() => setEditMode(false)}
           floated="right"
