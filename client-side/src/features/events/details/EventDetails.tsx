@@ -1,42 +1,40 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Card, Image, Button } from "semantic-ui-react";
-import { IEvent } from "../../../app/models/event";
+import EventStore from "../../../app/stores/eventStore";
+import { observer } from "mobx-react-lite";
 
-interface IProps {
-  event: IEvent;
-  setEditMode: (editMode: boolean) => void;
-  setSelectedEvent: (event: IEvent | null) => void;
-}
+const EventDetails: React.FC = () => {
+  const eventStore = useContext(EventStore);
+  const {
+    selectedEvent: event,
+    openEditForm,
+    cancelSelectedEvent,
+  } = eventStore;
 
-const EventDetails: React.FC<IProps> = ({
-  event,
-  setEditMode,
-  setSelectedEvent
-}) => {
   return (
     <Card fluid>
       <Image
-        src={`./assets/categoryImages/${event.category}.jpg`}
+        src={`./assets/categoryImages/${event!.category}.jpg`}
         wrapped
         ui={false}
       />
       <Card.Content>
-        <Card.Header>{event.title}</Card.Header>
+        <Card.Header>{event!.title}</Card.Header>
         <Card.Meta>
-          <span>{event.date}</span>
+          <span>{event!.date}</span>
         </Card.Meta>
-        <Card.Description>{event.description}</Card.Description>
+        <Card.Description>{event!.description}</Card.Description>
       </Card.Content>
       <Card.Content extra>
         <Button.Group widths={2}>
           <Button
-            onClick={() => setEditMode(true)}
+            onClick={() => openEditForm(event!.id)}
             basic
             color="blue"
             content="Edit"
           />
           <Button
-            onClick={() => setSelectedEvent(null)}
+            onClick={cancelSelectedEvent}
             basic
             color="grey"
             content="Cancel"
@@ -47,4 +45,4 @@ const EventDetails: React.FC<IProps> = ({
   );
 };
 
-export default EventDetails;
+export default observer(EventDetails);

@@ -1,26 +1,23 @@
-import React, { SyntheticEvent } from "react";
+import React, { useContext } from "react";
 import { Item, Button, Label, Segment } from "semantic-ui-react";
-import { IEvent } from "../../../app/models/event";
+import { observer } from "mobx-react-lite";
+import EventStore from "../../../app/stores/eventStore";
 
-interface IProps {
-  events: IEvent[];
-  selectEvent: (id: string) => void;
-  deleteEvent: (e: SyntheticEvent<HTMLButtonElement>, id: string) => void;
-  submiting: boolean;
-  target: string;
-}
+const EventList: React.FC = () => {
+  // bring in store
+  const eventStore = useContext(EventStore);
+  const {
+    eventsByDate,
+    selectEvent,
+    deleteEvent,
+    submitting,
+    target,
+  } = eventStore;
 
-const EventList: React.FC<IProps> = ({
-  events,
-  selectEvent,
-  deleteEvent,
-  submiting,
-  target,
-}) => {
   return (
     <Segment clearing>
       <Item.Group divided>
-        {events.map((event) => (
+        {eventsByDate.map((event) => (
           <Item key={event.id}>
             <Item.Content>
               <Item.Header as="a">{event.title}</Item.Header>
@@ -40,7 +37,7 @@ const EventList: React.FC<IProps> = ({
                 />
                 <Button
                   name={event.id}
-                  loading={target === event.id && submiting}
+                  loading={target === event.id && submitting}
                   onClick={(e) => deleteEvent(e, event.id)}
                   floated="right"
                   content="Delete"
@@ -56,4 +53,4 @@ const EventList: React.FC<IProps> = ({
   );
 };
 
-export default EventList;
+export default observer(EventList);

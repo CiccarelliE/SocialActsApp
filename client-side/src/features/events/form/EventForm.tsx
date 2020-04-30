@@ -1,25 +1,20 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useContext } from "react";
 import { Segment, Form, Button } from "semantic-ui-react";
 import { IEvent } from "../../../app/models/event";
 import { v4 as uuid } from "uuid";
+import EventStore from "../../../app/stores/eventStore";
+import { observer } from "mobx-react-lite";
 
 interface IProps {
-  setEditMode: (editMode: boolean) => void;
   currentEvent: IEvent;
-  createEvent: (event: IEvent) => void;
-  editEvent: (event: IEvent) => void;
-  submiting: boolean;
 }
 
 // currentEvent is going to be the var for if there is an exisiting event
 
-const EventForm: React.FC<IProps> = ({
-  setEditMode,
-  currentEvent,
-  createEvent,
-  editEvent,
-  submiting,
-}) => {
+const EventForm: React.FC<IProps> = ({ currentEvent }) => {
+  const eventStore = useContext(EventStore);
+  const { createEvent, editEvent, submitting, cancelFormOpen } = eventStore;
+
   // if there is an exisiting currentEvent value, return it
   const initializeForm = () => {
     if (currentEvent) {
@@ -108,14 +103,14 @@ const EventForm: React.FC<IProps> = ({
           value={modifyEvent.venue}
         />
         <Button
-          loading={submiting}
+          loading={submitting}
           floated="right"
           positive
           type="submit"
           content="Submit"
         />
         <Button
-          onClick={() => setEditMode(false)}
+          onClick={cancelFormOpen}
           floated="right"
           type="button"
           content="Cancel"
@@ -125,4 +120,4 @@ const EventForm: React.FC<IProps> = ({
   );
 };
 
-export default EventForm;
+export default observer(EventForm);
