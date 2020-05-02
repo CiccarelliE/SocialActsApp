@@ -9,15 +9,25 @@ configure({ enforceActions: "always" });
 class EventStore {
   @observable eventRegistry = new Map();
   @observable selectedEvent: IEvent | null = null;
-
   @observable loadingInitial: boolean = false;
   @observable submitting: boolean = false;
   @observable target = "";
 
   //use this when we already have the data inside our store, but can be modifed with the store
   @computed get eventsByDate() {
-    return Array.from(this.eventRegistry.values()).sort(
+    return this.groupEventsByDate(Array.from(this.eventRegistry.values()));
+  }
+
+  groupEventsByDate(events: IEvent[]) {
+    const sortedEvents = events.sort(
       (a, b) => Date.parse(a.date) - Date.parse(b.date)
+    );
+    return Object.entries(
+      sortedEvents.reduce((events, event) => {
+        const date = event.date.split("T")[0];
+        events[date] = events[date] ? [...events[date], event] : [event];
+        return events;
+      }, {} as { [key: string]: IEvent[] })
     );
   }
 

@@ -1,9 +1,13 @@
 import React, { useContext, useEffect } from "react";
-import { Card, Image, Button } from "semantic-ui-react";
+import { Grid, GridColumn } from "semantic-ui-react";
 import EventStore from "../../../app/stores/eventStore";
 import { observer } from "mobx-react-lite";
-import { RouteComponentProps, Link } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
+import EventDetailsHeader from "./EventDetailsHeader";
+import EventDetailsInfo from "./EventDetailsInfo";
+import EventDetailsChat from "./EventDetailsChat";
+import EventDetailsSideBar from "./EventDetailsSideBar";
 
 interface DetailParams {
   id: string;
@@ -11,7 +15,6 @@ interface DetailParams {
 
 const EventDetails: React.FC<RouteComponentProps<DetailParams>> = ({
   match,
-  history,
 }) => {
   const eventStore = useContext(EventStore);
   const { selectedEvent: event, loadEvent, loadingInitial } = eventStore;
@@ -24,37 +27,16 @@ const EventDetails: React.FC<RouteComponentProps<DetailParams>> = ({
     return <LoadingComponent content="Loading Event..." />;
 
   return (
-    <Card fluid>
-      <Image
-        src={`/assets/categoryImages/${event!.category}.jpg`}
-        wrapped
-        ui={false}
-      />
-      <Card.Content>
-        <Card.Header>{event!.title}</Card.Header>
-        <Card.Meta>
-          <span>{event!.date}</span>
-        </Card.Meta>
-        <Card.Description>{event!.description}</Card.Description>
-      </Card.Content>
-      <Card.Content extra>
-        <Button.Group widths={2}>
-          <Button
-            as={Link}
-            to={`/manage/${event.id}`}
-            basic
-            color="blue"
-            content="Edit"
-          />
-          <Button
-            onClick={() => history.push("/events")}
-            basic
-            color="grey"
-            content="Cancel"
-          />
-        </Button.Group>
-      </Card.Content>
-    </Card>
+    <Grid>
+      <GridColumn width={10}>
+        <EventDetailsHeader event={event} />
+        <EventDetailsInfo event={event} />
+        <EventDetailsChat />
+      </GridColumn>
+      <GridColumn width={6}>
+        <EventDetailsSideBar />
+      </GridColumn>
+    </Grid>
   );
 };
 
