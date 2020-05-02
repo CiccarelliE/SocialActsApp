@@ -1,43 +1,59 @@
-import React, { useState, FormEvent, useContext } from "react";
+import React, { useState, FormEvent, useContext, useEffect } from "react";
 import { Segment, Form, Button } from "semantic-ui-react";
 import { IEvent } from "../../../app/models/event";
 import { v4 as uuid } from "uuid";
 import EventStore from "../../../app/stores/eventStore";
 import { observer } from "mobx-react-lite";
+import { RouteComponentProps } from "react-router-dom";
 
-interface IProps {
-  currentEvent: IEvent;
+interface DetailsParams {
+  id: string;
 }
 
 // currentEvent is going to be the var for if there is an exisiting event
 
-const EventForm: React.FC<IProps> = ({ currentEvent }) => {
+const EventForm: React.FC<RouteComponentProps<DetailsParams>> = ({
+  match,
+  history,
+}) => {
   const eventStore = useContext(EventStore);
-  const { createEvent, editEvent, submitting, cancelFormOpen } = eventStore;
-
-  // if there is an exisiting currentEvent value, return it
-  const initializeForm = () => {
-    if (currentEvent) {
-      return currentEvent;
-    }
-    // if not, return an object, this object will be mostly used for create event function
-    // the object will consist of the modifyEvent state values
-    else {
-      return {
-        id: "",
-        title: "",
-        category: "",
-        description: "",
-        date: "",
-        city: "",
-        venue: "",
-      };
-    }
-  };
+  const {
+    createEvent,
+    editEvent,
+    submitting,
+    selectedEvent: currentEvent,
+    loadEvent,
+    clearEventFields,
+  } = eventStore;
 
   // modifyEvent is the state name and setModifyEvent is the action to alter state
   // modifyEvent will be the same type as all of the events in Event.ts interface
-  const [modifyEvent, setModifyEvent] = useState<IEvent>(initializeForm);
+  const [modifyEvent, setModifyEvent] = useState<IEvent>({
+    id: "",
+    title: "",
+    category: "",
+    description: "",
+    date: "",
+    city: "",
+    venue: "",
+  });
+
+  useEffect(() => {
+    if (match.params.id && modifyEvent.id.length === 0) {
+      loadEvent(match.params.id).then(() => {
+        currentEvent && setModifyEvent(currentEvent);
+      });
+    }
+    return () => {
+      clearEventFields();
+    };
+  }, [
+    loadEvent,
+    match.params.id,
+    currentEvent,
+    clearEventFields,
+    modifyEvent.id.length,
+  ]);
 
   const handleSubmit = () => {
     // must used modifyEvent.id because thats the new state name for creating a new event
@@ -46,9 +62,13 @@ const EventForm: React.FC<IProps> = ({ currentEvent }) => {
         ...modifyEvent,
         id: uuid(),
       };
-      createEvent(newEvent);
+      createEvent(newEvent).then(() => {
+        history.push(`/events/${newEvent.id}`);
+      });
     } else {
-      editEvent(modifyEvent);
+      editEvent(modifyEvent).then(() => {
+        history.push(`/events/${modifyEvent.id}`);
+      });
     }
   };
 
@@ -110,7 +130,7 @@ const EventForm: React.FC<IProps> = ({ currentEvent }) => {
           content="Submit"
         />
         <Button
-          onClick={cancelFormOpen}
+          onClick={() => history.push("/events")}
           floated="right"
           type="button"
           content="Cancel"

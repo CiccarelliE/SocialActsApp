@@ -1,20 +1,32 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Card, Image, Button } from "semantic-ui-react";
 import EventStore from "../../../app/stores/eventStore";
 import { observer } from "mobx-react-lite";
+import { RouteComponentProps, Link } from "react-router-dom";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 
-const EventDetails: React.FC = () => {
+interface DetailParams {
+  id: string;
+}
+
+const EventDetails: React.FC<RouteComponentProps<DetailParams>> = ({
+  match,
+  history,
+}) => {
   const eventStore = useContext(EventStore);
-  const {
-    selectedEvent: event,
-    openEditForm,
-    cancelSelectedEvent,
-  } = eventStore;
+  const { selectedEvent: event, loadEvent, loadingInitial } = eventStore;
+
+  useEffect(() => {
+    loadEvent(match.params.id);
+  }, [loadEvent, match.params.id]);
+
+  if (loadingInitial || !event)
+    return <LoadingComponent content="Loading Event..." />;
 
   return (
     <Card fluid>
       <Image
-        src={`./assets/categoryImages/${event!.category}.jpg`}
+        src={`/assets/categoryImages/${event!.category}.jpg`}
         wrapped
         ui={false}
       />
@@ -28,13 +40,14 @@ const EventDetails: React.FC = () => {
       <Card.Content extra>
         <Button.Group widths={2}>
           <Button
-            onClick={() => openEditForm(event!.id)}
+            as={Link}
+            to={`/manage/${event.id}`}
             basic
             color="blue"
             content="Edit"
           />
           <Button
-            onClick={cancelSelectedEvent}
+            onClick={() => history.push("/events")}
             basic
             color="grey"
             content="Cancel"

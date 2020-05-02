@@ -8,9 +8,8 @@ configure({ enforceActions: "always" });
 
 class EventStore {
   @observable eventRegistry = new Map();
-  @observable events: IEvent[] = [];
-  @observable selectedEvent: IEvent | undefined;
-  @observable editMode: boolean = false;
+  @observable selectedEvent: IEvent | null = null;
+
   @observable loadingInitial: boolean = false;
   @observable submitting: boolean = false;
   @observable target = "";
@@ -44,6 +43,39 @@ class EventStore {
     }
   };
 
+  // taking care of two problems:
+  // if user refreshes specific event page
+  // and if user goes directly to specific event page by url
+  @action loadEvent = async (id: string) => {
+    let event = this.getEvent(id);
+    if (event) {
+      this.selectedEvent = event;
+    } else {
+      this.loadingInitial = true;
+      try {
+        event = await agent.Events.details(id);
+        runInAction("getting event", () => {
+          this.selectedEvent = event;
+          this.loadingInitial = false;
+        });
+      } catch (error) {
+        runInAction("get event error", () => {
+          this.loadingInitial = false;
+        });
+        console.log(error);
+      }
+    }
+  };
+
+  getEvent = (id: string) => {
+    return this.eventRegistry.get(id);
+  };
+
+  // action clear form fields
+  @action clearEventFields = () => {
+    this.selectedEvent = null;
+  };
+
   //create event
   @action createEvent = async (event: IEvent) => {
     this.submitting = true;
@@ -51,7 +83,7 @@ class EventStore {
       await agent.Events.create(event);
       runInAction("create event", () => {
         this.eventRegistry.set(event.id, event);
-        this.editMode = false;
+
         this.submitting = false;
       });
     } catch (error) {
@@ -69,7 +101,7 @@ class EventStore {
       runInAction("edit event", () => {
         this.eventRegistry.set(event.id, event);
         this.selectedEvent = event;
-        this.editMode = false;
+
         this.submitting = false;
       });
     } catch (error) {
@@ -100,29 +132,6 @@ class EventStore {
       });
       console.log(error);
     }
-  };
-
-  @action openEditForm = (id: string) => {
-    this.selectedEvent = this.eventRegistry.get(id);
-    this.editMode = true;
-  };
-
-  @action openCreateForm = () => {
-    this.editMode = true;
-    this.selectedEvent = undefined;
-  };
-
-  @action cancelSelectedEvent = () => {
-    this.selectedEvent = undefined;
-  };
-
-  @action cancelFormOpen = () => {
-    this.editMode = false;
-  };
-  // selecting event
-  @action selectEvent = (id: string) => {
-    this.selectedEvent = this.eventRegistry.get(id);
-    this.editMode = false;
   };
 }
 

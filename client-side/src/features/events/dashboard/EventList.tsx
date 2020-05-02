@@ -2,17 +2,12 @@ import React, { useContext } from "react";
 import { Item, Button, Label, Segment } from "semantic-ui-react";
 import { observer } from "mobx-react-lite";
 import EventStore from "../../../app/stores/eventStore";
+import { Link } from "react-router-dom";
 
 const EventList: React.FC = () => {
   // bring in store
   const eventStore = useContext(EventStore);
-  const {
-    eventsByDate,
-    selectEvent,
-    deleteEvent,
-    submitting,
-    target,
-  } = eventStore;
+  const { eventsByDate, deleteEvent, submitting, target } = eventStore;
 
   return (
     <Segment clearing>
@@ -30,7 +25,8 @@ const EventList: React.FC = () => {
               </Item.Description>
               <Item.Extra>
                 <Button
-                  onClick={() => selectEvent(event.id)}
+                  as={Link}
+                  to={`/events/${event.id}`}
                   floated="right"
                   content="View"
                   color="blue"
