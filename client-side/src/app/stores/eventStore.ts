@@ -2,6 +2,7 @@ import { observable, action, computed, configure, runInAction } from "mobx";
 import { createContext, SyntheticEvent } from "react";
 import { IEvent } from "../models/event";
 import agent from "../api/agent";
+import { history } from "../..";
 
 //mobx strict mode
 configure({ enforceActions: "always" });
@@ -20,11 +21,11 @@ class EventStore {
 
   groupEventsByDate(events: IEvent[]) {
     const sortedEvents = events.sort(
-      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+      (a, b) => a.date.getTime() - b.date.getTime()
     );
     return Object.entries(
       sortedEvents.reduce((events, event) => {
-        const date = event.date.split("T")[0];
+        const date = event.date.toISOString().split("T")[0];
         events[date] = events[date] ? [...events[date], event] : [event];
         return events;
       }, {} as { [key: string]: IEvent[] })
@@ -40,7 +41,7 @@ class EventStore {
       runInAction("loading events", () => {
         events.forEach((event) => {
           // looping through response data and spliting the datetime at the period, we only want the first part so you add [0] at the end
-          event.date = event.date.split(".")[0];
+          event.date = new Date(event.date);
           this.eventRegistry.set(event.id, event);
         });
         this.loadingInitial = false;
@@ -60,14 +61,18 @@ class EventStore {
     let event = this.getEvent(id);
     if (event) {
       this.selectedEvent = event;
+      return event;
     } else {
       this.loadingInitial = true;
       try {
         event = await agent.Events.details(id);
         runInAction("getting event", () => {
+          event.date = new Date(event.date);
           this.selectedEvent = event;
+          this.eventRegistry.set(event.id, event);
           this.loadingInitial = false;
         });
+        return event;
       } catch (error) {
         runInAction("get event error", () => {
           this.loadingInitial = false;
@@ -93,9 +98,9 @@ class EventStore {
       await agent.Events.create(event);
       runInAction("create event", () => {
         this.eventRegistry.set(event.id, event);
-
         this.submitting = false;
       });
+      history.push(`/events/${event.id}`);
     } catch (error) {
       runInAction("create event errors", () => {
         this.submitting = false;
@@ -111,9 +116,9 @@ class EventStore {
       runInAction("edit event", () => {
         this.eventRegistry.set(event.id, event);
         this.selectedEvent = event;
-
         this.submitting = false;
       });
+      history.push(`/events/${event.id}`);
     } catch (error) {
       runInAction("edit event error", () => {
         this.submitting = false;

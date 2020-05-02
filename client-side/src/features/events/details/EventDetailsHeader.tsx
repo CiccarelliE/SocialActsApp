@@ -2,6 +2,8 @@ import React from "react";
 import { Segment, Item, Header, Button, Image } from "semantic-ui-react";
 import { IEvent } from "../../../app/models/event";
 import { observer } from "mobx-react-lite";
+import { Link } from "react-router-dom";
+import { format } from "date-fns";
 
 const eventImageStyle = {
   filter: "brightness(30%)",
@@ -34,7 +36,7 @@ const EventDetailsHeader: React.FC<{ event: IEvent }> = ({ event }) => {
                   content={event.title}
                   style={{ color: "white" }}
                 />
-                <p>{event.date}</p>
+                <p>{format(event.date, "eeee do MMMM")}</p>
                 <p>
                   Hosted by <strong>Bob</strong>
                 </p>
@@ -46,7 +48,12 @@ const EventDetailsHeader: React.FC<{ event: IEvent }> = ({ event }) => {
       <Segment clearing attached="bottom">
         <Button color="teal">Join Event</Button>
         <Button>Cancel attendance</Button>
-        <Button color="orange" floated="right">
+        <Button
+          as={Link}
+          to={`/manage/${event.id}`}
+          color="orange"
+          floated="right"
+        >
           Manage Event
         </Button>
       </Segment>

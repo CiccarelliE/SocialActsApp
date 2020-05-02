@@ -1,7 +1,7 @@
 import React from "react";
 import { Item, Button, Segment, Icon } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-
+import { format } from "date-fns";
 import { IEvent } from "../../../app/models/event";
 
 const EventListItem: React.FC<{ event: IEvent }> = ({ event }) => {
@@ -19,7 +19,7 @@ const EventListItem: React.FC<{ event: IEvent }> = ({ event }) => {
         </Item.Group>
       </Segment>
       <Segment>
-        <Icon name="clock" /> {event.date}
+        <Icon name="clock" /> {format(event.date, "h:mm a")}
         <Icon name="marker" /> {event.venue}, {event.city}
       </Segment>
       <Segment>Attendees will go here</Segment>

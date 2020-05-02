@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { Grid } from "semantic-ui-react";
 import EventList from "./EventList";
-
+import EventFilters from "./EventFilters";
 import { observer } from "mobx-react-lite";
 import EventStore from "../../../app/stores/eventStore";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
@@ -22,7 +22,7 @@ const EventDashboard: React.FC = () => {
         <EventList />
       </Grid.Column>
       <Grid.Column width={6}>
-        <h2>Event filters</h2>
+        <EventFilters />
       </Grid.Column>
     </Grid>
   );
